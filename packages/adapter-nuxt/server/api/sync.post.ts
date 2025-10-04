@@ -1,53 +1,59 @@
-import {
-  syncArenaChannels,
-  createSanityClient,
-  createArenaClient,
-} from "@arena-sanity/core";
+// server/api/sync.post.ts
+import { syncArenaChannels } from "@arena-sanity/core";
+import { createClient } from "@sanity/client";
+import { createArenaClient } from "../utils/arenaClient";
 
 export default defineEventHandler(async (event) => {
   const cfg = useRuntimeConfig();
 
-  // (Optional) simple bearer for manual triggering
-  // const auth = getHeader(event, 'authorization');
-  // if (process.env.SYNC_CRON_SECRET && auth !== `Bearer ${process.env.SYNC_CRON_SECRET}`) {
-  //   throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
-  // }
+  // Optional: simple auth
+  const secret = cfg.SYNC_CRON_SECRET || process.env.SYNC_CRON_SECRET;
+  const auth = getHeader(event, "authorization");
+  if (secret && auth !== `Bearer ${secret}`) {
+    setResponseStatus(event, 401);
+    return { success: false, message: "Unauthorized" };
+  }
 
-  // build clients
-  const sanity = createSanityClient({
+  const sanity = createClient({
     projectId: cfg.sanityProjectId!,
     dataset: cfg.sanityDataset!,
     token: cfg.sanityApiToken!,
+    apiVersion: "2024-05-15",
+    useCdn: false,
   });
+
   const arena = createArenaClient({ accessToken: cfg.arenaAccessToken! });
 
-  // for demo: accept channels via JSON body OR env list
   const body = await readBody<{ channels?: string[] }>(event).catch(
-    () => ({} as any)
+    () => ({}) as any,
   );
-  const channelsEnv = (process.env.ARENA_CHANNELS || "")
+
+  const envChannels = (process.env.ARENA_CHANNELS || "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  const channels = body?.channels?.length ? body.channels : channelsEnv;
+
+  const channels = (
+    body?.channels?.length ? body.channels : envChannels
+  ).filter(Boolean);
 
   if (!channels.length) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        'No channels provided. Pass JSON { "channels": ["slug1","slug2"] } or set ARENA_CHANNELS in env.',
-    });
+    setResponseStatus(event, 400);
+    return {
+      success: false,
+      message: "No channels provided. Pass in body or ARENA_CHANNELS.",
+    };
   }
 
   const result = await syncArenaChannels({
-    sanity,
     arena,
+    sanity,
     options: {
       channels,
-      perPage: 100,
       imageUpload: "auto",
       imageConcurrency: 3,
       timeBudgetMs: 260_000,
+      onLog: (e) => console.log(JSON.stringify(e)),
     },
   });
 

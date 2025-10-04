@@ -1,4 +1,8 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "include": ["src"]
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "types": ["@types/node"],
+    "strict": true
+  },
+  "include": ["nuxt.config.*", "app.config.*", "server/**/*", ".nuxt/**/*"]
 }

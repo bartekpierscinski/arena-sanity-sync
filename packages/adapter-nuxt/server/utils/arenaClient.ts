@@ -1,3 +1,7 @@
+// examples/nuxt-app/server/utils/arenaClient.ts
+// (Optional) silence TS since are.na ships no types
+declare module "are.na";
+
 import Arena from "are.na";
 
 export function createArenaClient({ accessToken }: { accessToken: string }) {
@@ -13,6 +17,10 @@ export function createArenaClient({ accessToken }: { accessToken: string }) {
         total_pages: res?.total_pages ?? 1,
         title: res?.title,
       };
+    },
+    async getChannelInfo(slug: string) {
+      const res = await api.channel(slug).get();
+      return { title: res?.title };
     },
   };
 }

@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "adapter-nuxt",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,9 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
-    "nuxt": "^3.12.4",
+    "@arena-sanity/core": "workspace:*",
     "@sanity/client": "^6.21.1",
-    "@arena-sanity/core": "workspace:*"
+    "are.na": "^0.1.5",
+    "nuxt": "^3.12.4"
   }
 }

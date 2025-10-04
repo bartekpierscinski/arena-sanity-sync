@@ -1,25 +1,25 @@
 export type ImageUploadMode = "off" | "auto" | "on";
 
 export interface SyncOptions {
-  channels: string[]; // required
-  perPage?: number; // default 100
-  arenaTimeoutMs?: number; // default 15000
-  imageTimeoutMs?: number; // default 15000
-  sanityTimeoutMs?: number; // default 20000
-  retries?: number; // default 3
-  backoffMs?: number; // default 600
-  logProgressEvery?: number; // default 25
-  heartbeatMs?: number; // default 10000
-  imageUpload?: ImageUploadMode; // default 'auto'
-  imageConcurrency?: number; // default 3
-  normalizeChannels?: boolean; // default true
-  driftFix?: boolean; // default true
-  timeBudgetMs?: number; // soft cap; optional
-  onLog?: (evt: Record<string, unknown>) => void; // structured logs
+  channels: string[];
+  perPage?: number;
+  arenaTimeoutMs?: number;
+  imageTimeoutMs?: number;
+  sanityTimeoutMs?: number;
+  retries?: number;
+  backoffMs?: number;
+  logProgressEvery?: number;
+  heartbeatMs?: number;
+  imageUpload?: ImageUploadMode;
+  imageConcurrency?: number;
+  normalizeChannels?: boolean;
+  driftFix?: boolean;
+  timeBudgetMs?: number;
+  onLog?: (e: Record<string, unknown>) => void;
 }
 
+/** Per-channel stats/result (NO 'channel' here) */
 export interface ChannelResult {
-  channel: string;
   success: boolean;
   created: number;
   updated: number;
@@ -30,24 +30,22 @@ export interface ChannelResult {
   blocksProcessed: number;
 }
 
+/** Top-level result holds channel name alongside ChannelResult */
 export interface SyncResult {
   success: boolean;
-  overallSuccess?: boolean; // kept for compatibility with your plugin
+  overallSuccess?: boolean;
   message: string;
   updatedOrCreated: number;
-  channels: (ChannelResult & { channel: string })[];
+  channels: Array<{ channel: string } & ChannelResult>;
   statusMessages: string[];
   syncRunId: string;
 }
 
 export interface ArenaClient {
-  // Must behave like: arena.channel(slug).get({page, per})
   getChannelPage: (
     slug: string,
-    params: { page: number; per: number }
+    params: { page: number; per: number },
   ) => Promise<{ contents: any[]; total_pages?: number; title?: string }>;
-
-  // Optional helper (so core can build channelMap); if not provided, titles fallback to slug.
   getChannelInfo?: (slug: string) => Promise<{ title?: string }>;
 }
 
@@ -62,16 +60,24 @@ export interface SanityPatchBuilder {
   commit(): Promise<any>;
 }
 
+export interface SanityAssetRef {
+  _id: string;
+}
+
 export interface SanityClientLite {
   getDocument: (id: string) => Promise<any | null>;
   create: (doc: any) => Promise<any>;
   fetch: (query: string, params?: Record<string, unknown>) => Promise<any>;
   patch: (id: string) => SanityPatchBuilder;
+
   assets: {
+    // Be permissive so @sanity/client’s overloads fit structurally
     upload: (
-      type: "image",
-      file: ArrayBuffer | Buffer | Blob,
-      options?: any
-    ) => Promise<SanityAssetRef>;
+      // real client accepts 'file' | 'image'
+      type: string,
+      // real client accepts Blob | File | ArrayBuffer | ArrayBufferView | Readable etc.
+      body: unknown,
+      options?: any,
+    ) => Promise<SanityAssetRef | any>;
   };
 }

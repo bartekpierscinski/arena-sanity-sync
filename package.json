@@ -11,6 +11,7 @@
     "install:nuxt": "pnpm -C examples/nuxt-app install"
   },
   "devDependencies": {
-    "@types/node": "^24.6.2"
+    "@types/node": "^24.6.2",
+    "typescript": "^5.9.3"
   }
 }

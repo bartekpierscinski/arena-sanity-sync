@@ -5,7 +5,7 @@ import {
   ArenaClient,
   SanityClientLite,
   ImageUploadMode,
-} from "./types";
+} from "./types.js";
 import {
   delay,
   withTimeout,
@@ -18,7 +18,7 @@ import {
   ensureKeys,
   channelsEqual,
   mergeChannels,
-} from "./utils";
+} from "./utils.js";
 
 // Fields you allow core to write (protects user-edited fields)
 const ARENA_OWNED = new Set([
@@ -45,7 +45,7 @@ const ARENA_OWNED = new Set([
 
 function shouldUploadImage(
   mode: ImageUploadMode,
-  ctx: { existing: any; imageSignatureChanged: boolean }
+  ctx: { existing: any; imageSignatureChanged: boolean },
 ) {
   if (mode === "off") return false;
   if (mode === "on") return ctx.imageSignatureChanged;
@@ -106,7 +106,7 @@ export async function syncArenaChannels(input: {
   const log = (
     lvl: "log" | "warn" | "error",
     msg: string,
-    extra: Record<string, unknown> = {}
+    extra: Record<string, unknown> = {},
   ) => opts.onLog?.({ run: syncRunId, lvl, msg, ...extra });
 
   for (const channelSlug of opts.channels) {
@@ -156,7 +156,7 @@ async function syncSingleChannel(ctx: {
   log: (
     lvl: "log" | "warn" | "error",
     msg: string,
-    extra?: Record<string, unknown>
+    extra?: Record<string, unknown>,
   ) => void;
 }): Promise<ChannelResult> {
   const {
@@ -183,7 +183,7 @@ async function syncSingleChannel(ctx: {
   let processedInChannel = 0;
   const heartbeat = setInterval(
     () => log("log", "heartbeat", { ch: channelSlug }),
-    opts.heartbeatMs
+    opts.heartbeatMs,
   );
 
   const processPage = async (blocks: any[]) => {
@@ -218,7 +218,7 @@ async function syncSingleChannel(ctx: {
         const channels = mergeChannels(
           existing?.channels,
           blockChannels,
-          channelMap
+          channelMap,
         );
 
         const imageSignature = buildImageSignature(block);
@@ -239,7 +239,7 @@ async function syncSingleChannel(ctx: {
             const merged = mergeChannels(
               existing?.channels,
               channels,
-              channelMap
+              channelMap,
             );
             if (!channelsEqual(merged, existing.channels || [])) {
               await sanity
@@ -303,11 +303,7 @@ async function syncSingleChannel(ctx: {
                 const asset = await sanity.assets.upload("image", buf, {
                   filename:
                     block.image.filename ||
-                    `arena-${block.id}-${Date.now()}.${
-                      block.image.content_type
-                        ? block.image.content_type.split("/")[1]
-                        : "jpg"
-                    }`,
+                    `arena-${block.id}-${Date.now()}.${block.image.content_type ? block.image.content_type.split("/")[1] : "jpg"}`,
                 });
                 mainImagePatch.mainImage = {
                   _type: "image",
@@ -349,7 +345,7 @@ async function syncSingleChannel(ctx: {
           ...mainImagePatch,
         };
         const filteredArenaPatch = Object.fromEntries(
-          Object.entries(arenaPatch).filter(([k]) => ARENA_OWNED.has(k))
+          Object.entries(arenaPatch).filter(([k]) => ARENA_OWNED.has(k)),
         );
 
         if (!existing) {
@@ -393,7 +389,7 @@ async function syncSingleChannel(ctx: {
             const merged = mergeChannels(
               existing?.channels,
               channels,
-              channelMap
+              channelMap,
             );
             patch.set({ channels: merged });
 
@@ -426,13 +422,13 @@ async function syncSingleChannel(ctx: {
         withTimeout(
           arena.getChannelPage(channelSlug, { page, per: opts.perPage }),
           opts.arenaTimeoutMs,
-          "arena.initial"
+          "arena.initial",
         ),
       {
         retries: opts.retries,
         backoffMs: opts.backoffMs,
         label: "arena.initial",
-      }
+      },
     );
 
     if (!initial?.contents) {
@@ -465,13 +461,13 @@ async function syncSingleChannel(ctx: {
           withTimeout(
             arena.getChannelPage(channelSlug, { page, per: opts.perPage }),
             opts.arenaTimeoutMs,
-            "arena.page"
+            "arena.page",
           ),
         {
           retries: opts.retries,
           backoffMs: opts.backoffMs,
           label: `arena.page.${page}`,
-        }
+        },
       );
       const pageCount = cp?.contents?.length || 0;
       log("log", "page_fetched", { ch: channelSlug, page, added: pageCount });
@@ -487,7 +483,7 @@ async function syncSingleChannel(ctx: {
         docs = await withTimeout(
           sanity.fetch(driftQuery, { slug: channelSlug }),
           opts.sanityTimeoutMs,
-          "sanity.drift.fetch"
+          "sanity.drift.fetch",
         );
       } catch (e: any) {
         log("warn", "drift_fetch_timeout", {
@@ -500,7 +496,7 @@ async function syncSingleChannel(ctx: {
       for (const d of docs) {
         if (!seenIds.has(d.arenaId)) {
           const newChannels = ensureKeys(
-            (d.channels || []).filter((c: any) => c.slug !== channelSlug)
+            (d.channels || []).filter((c: any) => c.slug !== channelSlug),
           );
           try {
             const patch = sanity.patch(d._id).set({
@@ -552,5 +548,5 @@ function safeHost(url: string) {
   }
 }
 
-export * from "./types";
-export * from "./utils";
+export * from "./types.js";
+export * from "./utils.js";
