@@ -8,7 +8,8 @@
     "dev:nuxt": "pnpm -C examples/nuxt-app dev",
     "build:nuxt": "pnpm -C examples/nuxt-app build",
     "preview:nuxt": "pnpm -C examples/nuxt-app preview",
-    "install:nuxt": "pnpm -C examples/nuxt-app install"
+    "install:nuxt": "pnpm -C examples/nuxt-app install",
+    "publish:core": "pnpm -C packages/core publish --access public"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
