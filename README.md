@@ -5,7 +5,7 @@ Sync Are.na channels into Sanity.
 This monorepo provides:
 
 - 🛠️ **arena-sanity-core** – framework-agnostic sync engine (Are.na → Sanity).
-- ⚡ **@arena-sanity/adapter-nuxt** – ready-made Nuxt 3 API route for triggering syncs.
+- ⚡ **arena-sanity-adapter-nuxt** – ready-made Nuxt 3 API route for triggering syncs.
 - 🎛️ **sanity-plugin-arena-sync** – Sanity Studio dashboard plugin (view status, configure channels, trigger syncs manually).
 
 ---
@@ -24,7 +24,7 @@ The low-level sync engine.
 
 ---
 
-### [@arena-sanity/adapter-nuxt](./packages/adapter-nuxt)
+### [arena-sanity-adapter-nuxt](./packages/adapter-nuxt)
 
 Nuxt 3 example adapter.
 
@@ -99,7 +99,7 @@ SYNC_CRON_SECRET=optional-secret
 4. Run locally
 
 ```bash
-pnpm -F @arena-sanity/adapter-nuxt dev
+pnpm -F arena-sanity-adapter-nuxt dev
 ```
 
 ---
@@ -272,7 +272,7 @@ arena-sanity-sync/
 │  ├─ sanity.config.ts       #example sanity config setup
 ├─ packages/
 │  ├─ core/                  # arena-sanity-core
-│  ├─ adapter-nuxt/          # @arena-sanity/adapter-nuxt
+│  ├─ adapter-nuxt/          # arena-sanity-adapter-nuxt
 │  └─ sanity-plugin-arena-sync/ # Sanity Studio plugin
 ├─ schemas/arena/            # Example Sanity schemas
 ├─ tsconfig.base.json

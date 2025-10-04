@@ -161,5 +161,5 @@ export default {
 
 ## Related
 
-- `@arena-sanity/adapter-nuxt` — drop-in Nuxt 3 API route.
+- `arena-sanity-adapter-nuxt` — drop-in Nuxt 3 API route.
 - `sanity-plugin-arena-sync` — Studio dashboard plugin for config and manual sync trigger.
