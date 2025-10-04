@@ -1,5 +1,5 @@
 // server/api/sync.post.ts
-import { syncArenaChannels } from "@arena-sanity/core";
+import { syncArenaChannels } from "arena-sanity-core;
 import { createClient } from "@sanity/client";
 import { createArenaClient } from "../utils/arenaClient";
 

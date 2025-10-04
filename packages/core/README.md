@@ -1,4 +1,4 @@
-# @arena-sanity/core
+# arena-sanity-core
 
 The framework-agnostic sync engine for keeping [Are.na](https://are.na) channels in sync with your [Sanity](https://www.sanity.io) dataset.
 
@@ -20,7 +20,7 @@ This package provides the core sync logic only — no Nuxt integration or Studio
 Install from npm:
 
 ```bash
-npm install @arena-sanity/core
+npm install arena-sanity-core
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ import {
   syncArenaChannels,
   createSanityClient,
   createArenaClient,
-} from "@arena-sanity/core";
+} from "arena-sanity-core";
 
 const sanity = createSanityClient({
   projectId: process.env.SANITY_PROJECT_ID,
@@ -130,7 +130,7 @@ import {
   syncArenaChannels,
   createSanityClient,
   createArenaClient,
-} from "@arena-sanity/core";
+} from "arena-sanity-core;
 
 export default {
   async scheduled(event, env, ctx) {

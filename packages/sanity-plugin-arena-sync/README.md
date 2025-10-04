@@ -35,7 +35,7 @@ export default defineConfig({
 
 ## Setting up the sync endpoint
 
-The plugin does not perform the sync itself. Instead it POSTs to an HTTP endpoint you host (Nuxt/Next/Node/Serverless). That endpoint should call `@arena-sanity/core` (for example `syncArenaChannels`) to run the sync.
+The plugin does not perform the sync itself. Instead it POSTs to an HTTP endpoint you host (Nuxt/Next/Node/Serverless). That endpoint should call `arena-sanity-core` (for example `syncArenaChannels`) to run the sync.
 
 Guidance:
 
@@ -63,7 +63,6 @@ schemas/arena/arenaSyncConfig.js
 [View arenaSyncConfig.js](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaSyncConfig.js)
 
 Copy the file `arenaSyncConfig.js` into your Studio's `schemas/` folder, then import it into your schema registry.
-
 
 How to import it (example):
 
