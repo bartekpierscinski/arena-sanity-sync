@@ -1,0 +1,70 @@
+{
+  "name": "sanity-plugin-arena-sync",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "sanity",
+    "sanity-plugin"
+  ],
+  "license": "MIT",
+  "author": "Bartek Pierściński <bartoszjpierscinski@gmail.com>",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "source": "./src/index.js",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "sanity.json",
+    "src",
+    "v2-incompatible.js"
+  ],
+  "scripts": {
+    "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
+    "format": "prettier --write --cache --ignore-unknown .",
+    "link-watch": "plugin-kit link-watch",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build",
+    "watch": "pkg-utils watch --strict"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.2.1",
+    "@sanity/incompatible-plugin": "^1.0.5",
+    "@sanity/ui": "^2.15.17",
+    "are.na": "^0.1.5"
+  },
+  "devDependencies": {
+    "@sanity/pkg-utils": "^7.2.2",
+    "@sanity/plugin-kit": "^4.0.19",
+    "@types/react": "^19.1.4",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-config-sanity": "^7.1.4",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-packagejson": "^2.5.12",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sanity": "^3.88.3",
+    "styled-components": "^6.1.18",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "sanity": "^3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "browserslist": "extends @sanity/browserslist-config"
+}

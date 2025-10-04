@@ -1,0 +1,24 @@
+{
+  "name": "@arena-sanity/core",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "echo \"(no tests yet)\""
+  },
+  "dependencies": {
+    "@sanity/client": "^6.21.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
