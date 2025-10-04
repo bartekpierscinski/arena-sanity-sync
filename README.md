@@ -1,4 +1,4 @@
-# Arena ↔ Sanity Sync
+# Are.na ↔ Sanity Sync
 
 Sync Are.na channels into Sanity.
 
