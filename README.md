@@ -268,6 +268,8 @@ Uploading into Sanity counts toward asset storage costs.
 
 ```
 arena-sanity-sync/
+├─ examples/
+│  ├─ sanity.config.ts       #example sanity config setup
 ├─ packages/
 │  ├─ core/                  # arena-sanity-core
 │  ├─ adapter-nuxt/          # @arena-sanity/adapter-nuxt
