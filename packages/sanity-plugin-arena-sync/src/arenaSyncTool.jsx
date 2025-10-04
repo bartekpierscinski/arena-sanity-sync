@@ -67,9 +67,10 @@ const ArenaSyncTool = () => {
     })
 
     try {
+      const fallback = process.env.SANITY_STUDIO_SYNC_ENDPOINT
+      const syncApiEndpoint = (config && config.syncEndpoint) || fallback
+      if (!syncApiEndpoint) throw new Error('No sync endpoint configured')
       // Optional: allow URL to come from config doc if you add it later
-      const syncApiEndpoint =
-        (config && config.syncEndpoint) || 'https://melisacenik.xyz/api/sync-arena-channels'
 
       const response = await fetch(syncApiEndpoint, {method: 'POST'})
 

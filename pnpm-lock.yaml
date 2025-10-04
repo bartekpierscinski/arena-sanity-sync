@@ -15,7 +15,35 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  examples/arena-sync:
+  packages/adapter-nuxt:
+    dependencies:
+      '@arena-sanity/core':
+        specifier: workspace:*
+        version: link:../core
+      '@sanity/client':
+        specifier: ^6.21.1
+        version: 6.29.1(debug@4.4.3)
+      are.na:
+        specifier: ^0.1.5
+        version: 0.1.5
+      nuxt:
+        specifier: ^3.12.4
+        version: 3.19.2(@parcel/watcher@2.5.1)(@types/node@24.6.2)(@vue/compiler-sfc@3.5.22)(db0@0.3.4)(eslint@8.57.1)(ioredis@5.8.0)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rolldown@1.0.0-beta.32)(rollup@4.52.4)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.9(@types/node@24.6.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(yaml@2.8.1)
+
+  packages/core:
+    dependencies:
+      '@sanity/client':
+        specifier: ^6.21.1
+        version: 6.29.1(debug@4.4.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.6.2
+        version: 24.6.2
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/sanity-arena-sync:
     dependencies:
       '@sanity/client':
         specifier: ^7.2.1
@@ -83,34 +111,6 @@ importers:
         version: 6.1.19(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       typescript:
         specifier: ^5.8.3
-        version: 5.9.3
-
-  packages/adapter-nuxt:
-    dependencies:
-      '@arena-sanity/core':
-        specifier: workspace:*
-        version: link:../core
-      '@sanity/client':
-        specifier: ^6.21.1
-        version: 6.29.1(debug@4.4.3)
-      are.na:
-        specifier: ^0.1.5
-        version: 0.1.5
-      nuxt:
-        specifier: ^3.12.4
-        version: 3.19.2(@parcel/watcher@2.5.1)(@types/node@24.6.2)(@vue/compiler-sfc@3.5.22)(db0@0.3.4)(eslint@8.57.1)(ioredis@5.8.0)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rolldown@1.0.0-beta.32)(rollup@4.52.4)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.9(@types/node@24.6.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(yaml@2.8.1)
-
-  packages/core:
-    dependencies:
-      '@sanity/client':
-        specifier: ^6.21.1
-        version: 6.29.1(debug@4.4.3)
-    devDependencies:
-      '@types/node':
-        specifier: ^24.6.2
-        version: 24.6.2
-      typescript:
-        specifier: ^5.6.0
         version: 5.9.3
 
 packages:
