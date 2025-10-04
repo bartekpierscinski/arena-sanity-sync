@@ -133,6 +133,106 @@ Note: the example schemas demonstrate the arena* fields the sync uses. The sync 
 
 ---
 
+## 🖥 Sanity Studio setup
+
+Besides the sync engine and dashboard plugin, you’ll likely want synced Are.na channels to show up in your **Studio Desk structure**.
+
+Here’s an example `sanity.config.ts` with a custom structure:
+
+```ts
+import { defineConfig } from "sanity";
+import { structureTool } from "sanity/structure";
+import { arenaSyncPlugin } from "sanity-plugin-arena-sync";
+import Arena from "are.na";
+
+const ARENA_CONFIG_SCHEMA_TYPE = "arenaSyncConfig";
+const ARENA_BLOCK_SCHEMA_TYPE = "areNaBlock";
+const ARENA_CHANNEL_SETTINGS_SCHEMA_TYPE = "arenaChannelSettings";
+const ARENA_CONFIG_DOC_ID = "arenaSyncConfig";
+
+export default defineConfig({
+  // ...
+  plugins: [
+    structureTool({
+      structure: (S, { getClient }) =>
+        S.list()
+          .title("Content")
+          .items([
+            S.listItem()
+              .title("Are.na Sync Configuration")
+              .child(
+                S.document()
+                  .schemaType(ARENA_CONFIG_SCHEMA_TYPE)
+                  .documentId(ARENA_CONFIG_DOC_ID)
+                  .title("Configure Are.na Sync"),
+              ),
+            S.divider(),
+            S.listItem()
+              .title("Are.na Channels")
+              .child(async () => {
+                const client = getClient({ apiVersion: "2024-05-15" });
+                const config = await client.fetch(
+                  `*[_type == "${ARENA_CONFIG_SCHEMA_TYPE}" && _id == "${ARENA_CONFIG_DOC_ID}"][0]`,
+                );
+
+                if (!config?.channelSlugs?.length) {
+                  return S.component()
+                    .title("No channels configured")
+                    .id("no-arena-channels")
+                    .setHtml("Please add channel slugs in the config doc.");
+                }
+
+                return S.list()
+                  .title("Channels")
+                  .items(
+                    config.channelSlugs.map((slug) =>
+                      S.listItem()
+                        .title(slug)
+                        .child(
+                          S.list()
+                            .title(`Channel: ${slug}`)
+                            .items([
+                              S.listItem()
+                                .title("Blocks")
+                                .child(
+                                  S.documentList()
+                                    .title(`Blocks in ${slug}`)
+                                    .filter(
+                                      `_type == "${ARENA_BLOCK_SCHEMA_TYPE}" && arenaChannelSlug == $slug`,
+                                    )
+                                    .params({ slug }),
+                                ),
+                              S.listItem()
+                                .title("Settings")
+                                .child(
+                                  S.document()
+                                    .schemaType(
+                                      ARENA_CHANNEL_SETTINGS_SCHEMA_TYPE,
+                                    )
+                                    .documentId(
+                                      `arena-channel-settings-${slug}`,
+                                    ),
+                                ),
+                            ]),
+                        ),
+                    ),
+                  );
+              }),
+            S.documentTypeListItem(ARENA_BLOCK_SCHEMA_TYPE).title(
+              "All Are.na Blocks",
+            ),
+          ]),
+    }),
+    arenaSyncPlugin(),
+  ],
+});
+```
+
+> **Extended example:**
+> For a more comprehensive setup, see [`examples/sanity.config.ts`](./examples/sanity.config.ts) in this repository.
+
+---
+
 🌐 cURL example
 
 Trigger sync via the Nuxt API route:
