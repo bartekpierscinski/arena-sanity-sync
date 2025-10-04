@@ -17,7 +17,7 @@ import {useClient} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
 
 const SANITY_API_VERSION = '2024-05-15'
-const CONFIG_DOC_ID = 'arenaSyncConfiguration'
+const CONFIG_DOC_ID = 'arenaSyncConfig'
 
 const ArenaSyncTool = () => {
   const client = useClient({apiVersion: SANITY_API_VERSION})
@@ -34,7 +34,7 @@ const ArenaSyncTool = () => {
       setConfig(fetchedConfig)
       if (!fetchedConfig) {
         setStatusMessage(
-          'Are.na Sync Configuration document not found. Please create it with the ID "arenaSyncConfiguration".',
+          'Are.na Sync Configuration document not found. Please create it with the ID "arenaSyncConfig".',
         )
       } else {
         setStatusMessage('Configuration loaded.')
@@ -210,7 +210,7 @@ const ArenaSyncTool = () => {
                 tone="primary"
                 icon={LinkIcon}
                 onClick={() => {
-                  window.location.href = `structure/areNaSyncConfiguration`
+                  window.location.href = `structure/arenaSyncConfig`
                 }}
               />
               <Button
