@@ -9,6 +9,10 @@ Adds an Are.na Sync dashboard to your Studio:
 - Lets editors trigger a manual sync (the plugin calls your backend endpoint).
 - Auto-refreshes when configuration changes.
 
+This plugin is part of an ecosystem of packages for syncing Are.na content to Sanity. For more information and documentation, please visit the main repository:
+
+[https://github.com/bartekpierscinski/arena-sanity-sync](https://github.com/bartekpierscinski/arena-sanity-sync)
+
 ---
 
 ## Installation
