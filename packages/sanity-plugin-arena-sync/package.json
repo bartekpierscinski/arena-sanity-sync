@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-arena-sync",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "keywords": [
     "sanity",
@@ -23,7 +23,8 @@
     "dist",
     "sanity.json",
     "src",
-    "v2-incompatible.js"
+    "v2-incompatible.js",
+    "README.md"
   ],
   "scripts": {
     "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
