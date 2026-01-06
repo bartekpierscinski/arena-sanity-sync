@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@sanity/client": "^7.2.1",
+    "@sanity/icons": "^3.5.0",
     "@sanity/incompatible-plugin": "^1.0.5",
     "@sanity/ui": "^2.15.17",
     "are.na": "^0.1.5"
