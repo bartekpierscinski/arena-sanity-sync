@@ -42,7 +42,7 @@ jobs:
         run: pnpm -C packages/core test
 
       - name: Type check
-        run: pnpm -C packages/core tsc --noEmit
+        run: pnpm -C packages/core typecheck
 
   lint:
     runs-on: ubuntu-latest
