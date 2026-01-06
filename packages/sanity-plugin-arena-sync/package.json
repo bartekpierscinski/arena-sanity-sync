@@ -31,8 +31,7 @@
     "link-watch": "plugin-kit link-watch",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "watch": "pkg-utils watch --strict",
-    "prepare": "husky"
+    "watch": "pkg-utils watch --strict"
   },
   "dependencies": {
     "@sanity/client": "^7.2.1",
