@@ -1,4 +1,3 @@
-// my-arena-sync-plugin/src/ArenaSyncTool.jsx
 import React, {useState, useCallback, useEffect} from 'react'
 import {
   Box,
@@ -13,8 +12,8 @@ import {
   Flex,
   Badge,
 } from '@sanity/ui'
-import {useClient} from 'sanity'
-import {LinkIcon} from '@sanity/icons'
+import {useClient, IntentLink} from 'sanity'
+import {EditIcon} from '@sanity/icons'
 
 const SANITY_API_VERSION = '2024-05-15'
 const CONFIG_DOC_ID = 'arenaSyncConfig'
@@ -151,10 +150,7 @@ const ArenaSyncTool = () => {
         {!isLoading && !config && (
           <Card padding={4} tone="critical" radius={2} shadow={1}>
             <Flex gap={2} align="center">
-              <Badge tone="critical" fontSize={2}>
-                {' '}
-                {/* Consider using an Icon component here */}!
-              </Badge>
+              <Badge tone="critical" fontSize={2}>!</Badge>
               <Text>
                 Configuration document not found. Please create a document with ID{' '}
                 <Code>{CONFIG_DOC_ID}</Code> of type <Code>arenaSyncConfig</Code>.
@@ -204,15 +200,19 @@ const ArenaSyncTool = () => {
             </Box>
 
             {/* Action Buttons */}
-            <Flex gap={3} direction={['column', 'sm:row']} marginTop={1}>
-              <Button
-                text="Edit Sync Configuration"
-                tone="primary"
-                icon={LinkIcon}
-                onClick={() => {
-                  window.location.href = `structure/arenaSyncConfig`
-                }}
-              />
+            <Flex gap={3} direction={['column', 'row']} marginTop={1}>
+              <IntentLink
+                intent="edit"
+                params={{id: CONFIG_DOC_ID}}
+                style={{textDecoration: 'none'}}
+              >
+                <Button
+                  text="Edit Sync Configuration"
+                  tone="primary"
+                  icon={EditIcon}
+                  as="span"
+                />
+              </IntentLink>
               <Button
                 text="Refresh Status"
                 onClick={fetchConfig}
@@ -225,15 +225,12 @@ const ArenaSyncTool = () => {
 
         {/* Manual Sync Section */}
         <Box style={{borderTop: '1px solid var(--card-border-color)'}} paddingTop={4} marginTop={4}>
-          {' '}
-          {/* Added marginTop for better separation */}
           <Heading as="h2" size={3}>
             Manual Sync
           </Heading>
           <Text size={2} muted>
-            {' '}
-            {/* Increased size for better readability */}
-            The sync runs automatically every 10 minutes. You can also trigger it manually.
+            Trigger a sync to your configured endpoint. Configure automatic syncs via cron or
+            scheduled tasks on your backend.
           </Text>
           <Button
             marginTop={3}
@@ -246,14 +243,11 @@ const ArenaSyncTool = () => {
         </Box>
 
         {/* Status Message */}
-        {!!statusMessage &&
-          !isLoading && ( // Ensure statusMessage is not empty before rendering Text
-            <Text muted size={1} marginTop={2}>
-              {' '}
-              {/* Added marginTop */}
-              {statusMessage}
-            </Text>
-          )}
+        {statusMessage && !isLoading && (
+          <Text muted size={1} marginTop={2}>
+            {statusMessage}
+          </Text>
+        )}
       </Stack>
     </Card>
   )
