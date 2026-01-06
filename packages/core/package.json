@@ -1,6 +1,6 @@
 {
   "name": "arena-sanity-core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Framework-agnostic sync engine for Are.na to Sanity",
   "type": "module",
   "private": false,
@@ -36,6 +36,9 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "arena-sanity-core": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
