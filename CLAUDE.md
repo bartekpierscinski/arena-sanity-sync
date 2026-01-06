@@ -25,6 +25,12 @@ pnpm -C packages/core dev
 
 # Lint the Sanity plugin
 pnpm -C packages/sanity-plugin-arena-sync lint
+
+# Run core tests
+pnpm -C packages/core test
+
+# Run core tests in watch mode
+pnpm -C packages/core test:watch
 ```
 
 ## Architecture
@@ -32,7 +38,12 @@ pnpm -C packages/sanity-plugin-arena-sync lint
 This is a pnpm monorepo with three packages that sync Are.na channels to Sanity:
 
 ### packages/core (arena-sanity-core)
-Framework-agnostic sync engine. Main export is `syncArenaChannels()` which:
+Framework-agnostic sync engine. Main exports:
+- `syncArenaChannels()` - main sync function
+- `createSanityClient()` - helper to create configured Sanity client
+- `createArenaClient()` - helper to create Are.na client (requires optional `are.na` peer dep)
+
+`syncArenaChannels()` behavior:
 - Fetches Are.na channel pages via `ArenaClient` interface
 - Creates/updates Sanity documents via `SanityClientLite` interface
 - Uses fingerprint + `arenaUpdatedAt` for idempotent updates (skips unchanged blocks)
