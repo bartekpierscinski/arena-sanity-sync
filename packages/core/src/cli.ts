@@ -6,7 +6,7 @@ import { createSanityClient } from "./sanity.js";
 import { createArenaClient } from "./arena.js";
 import type { ImageUploadMode } from "./types.js";
 
-const VERSION = "0.3.0";
+const VERSION = "0.3.1";
 
 const HELP = `
 arena-sanity-core - Sync Are.na channels to Sanity
