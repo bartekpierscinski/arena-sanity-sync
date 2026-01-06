@@ -145,14 +145,14 @@ describe("channelsEqual", () => {
 
 describe("ensureKeys", () => {
   it("should add _key to items without one", () => {
-    const input = [{ slug: "test" }];
+    const input = [{ slug: "test", _key: undefined }] as { slug: string; _key?: string }[];
     const result = ensureKeys(input);
     expect(result[0]._key).toBeTruthy();
     expect(result[0].slug).toBe("test");
   });
 
   it("should preserve existing _key", () => {
-    const input = [{ slug: "test", _key: "existing" }];
+    const input = [{ slug: "test", _key: "existing" }] as { slug: string; _key?: string }[];
     const result = ensureKeys(input);
     expect(result[0]._key).toBe("existing");
   });
