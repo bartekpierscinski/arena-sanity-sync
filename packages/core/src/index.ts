@@ -550,3 +550,5 @@ function safeHost(url: string) {
 
 export * from "./types.js";
 export * from "./utils.js";
+export { createSanityClient } from "./sanity.js";
+export { createArenaClient } from "./arena.js";

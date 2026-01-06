@@ -60,10 +60,6 @@ export interface SanityPatchBuilder {
   commit(): Promise<any>;
 }
 
-export interface SanityAssetRef {
-  _id: string;
-}
-
 export interface SanityClientLite {
   getDocument: (id: string) => Promise<any | null>;
   create: (doc: any) => Promise<any>;

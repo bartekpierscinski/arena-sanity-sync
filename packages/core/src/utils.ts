@@ -96,7 +96,7 @@ export function computeFingerprint(block: any) {
           }
         : null,
     };
-    return Buffer.from(JSON.stringify(core)).toString("base64");
+    return btoa(JSON.stringify(core));
   } catch {
     return null;
   }

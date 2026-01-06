@@ -1,7 +1,32 @@
 {
   "name": "arena-sanity-core",
-  "version": "0.1.1",
+  "version": "0.2.0",
+  "description": "Framework-agnostic sync engine for Are.na to Sanity",
+  "type": "module",
   "private": false,
+  "license": "MIT",
+  "author": "Bartek Pierscinski <bartoszjpierscinski@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bartekpierscinski/arena-sanity-sync.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/bartekpierscinski/arena-sanity-sync#readme",
+  "bugs": {
+    "url": "https://github.com/bartekpierscinski/arena-sanity-sync/issues"
+  },
+  "keywords": [
+    "arena",
+    "are.na",
+    "sanity",
+    "sanity.io",
+    "sync",
+    "cms",
+    "content"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist",
     "package.json",
@@ -19,13 +44,22 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
-    "test": "echo \"(no tests yet)\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "dependencies": {
-    "@sanity/client": "^6.21.1"
+  "peerDependencies": {
+    "@sanity/client": "^6.0.0 || ^7.0.0",
+    "are.na": "^0.1.5"
+  },
+  "peerDependenciesMeta": {
+    "are.na": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@sanity/client": "^6.21.1",
     "@types/node": "^24.6.2",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
   }
 }

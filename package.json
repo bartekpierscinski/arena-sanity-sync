@@ -5,10 +5,7 @@
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "build": "pnpm -r -F \"./packages/*\" run build",
-    "dev:nuxt": "pnpm -C examples/nuxt-app dev",
-    "build:nuxt": "pnpm -C examples/nuxt-app build",
-    "preview:nuxt": "pnpm -C examples/nuxt-app preview",
-    "install:nuxt": "pnpm -C examples/nuxt-app install",
+    "build:core": "pnpm -C packages/core build",
     "publish:core": "pnpm -C packages/core publish --access public"
   },
   "devDependencies": {

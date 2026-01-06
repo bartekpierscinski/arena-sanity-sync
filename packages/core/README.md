@@ -130,7 +130,7 @@ import {
   syncArenaChannels,
   createSanityClient,
   createArenaClient,
-} from "arena-sanity-core;
+} from "arena-sanity-core";
 
 export default {
   async scheduled(event, env, ctx) {

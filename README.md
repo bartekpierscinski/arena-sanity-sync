@@ -59,7 +59,7 @@ pnpm add arena-sanity-core @sanity/client
 2. Add a Nuxt API route (`server/api/sync.post.ts`)
 
 ```ts
-import { syncArenaChannels } from "arena-sanity-core;
+import { syncArenaChannels } from "arena-sanity-core";
 import { createArenaClient } from "../utils/arenaClient";
 import { createClient } from "@sanity/client";
 
