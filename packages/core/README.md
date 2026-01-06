@@ -1,31 +1,38 @@
 # arena-sanity-core
 
-The framework-agnostic sync engine for keeping [Are.na](https://are.na) channels in sync with your [Sanity](https://www.sanity.io) dataset.
+Framework-agnostic sync engine for keeping [Are.na](https://are.na) channels in sync with your [Sanity](https://www.sanity.io) dataset.
 
-This package provides the core sync logic only — no Nuxt integration or Studio UI. Use it to build your own adapter (Next.js, Cloudflare Workers, CLI, etc.).
+This package provides the core sync logic only. Use it to build your own adapter (Nuxt, Next.js, Cloudflare Workers, CLI, etc.).
 
 ---
 
 ## Features
 
-- 🔗 Sync Are.na → Sanity: Keep Are.na blocks mirrored as Sanity documents.
-- 🔑 Idempotent updates: Only patches changed blocks (uses fingerprint & updated_at).
-- 🖼️ Image upload modes: Control whether to import images to Sanity or store remote URLs.
-- ⚡ Timeouts & retries: Robust against network hiccups.
-- 🧩 Framework-agnostic: Works in Node, serverless environments, or custom cron jobs.
-- 🛡️ Field protection: Only updates `arena*` fields and `channels`. Respects `lockAll` and `lockImage` if present.
+- **Sync Are.na to Sanity** - mirrors Are.na blocks as Sanity documents
+- **Idempotent updates** - only patches changed blocks (uses fingerprint + `updated_at`)
+- **Image upload modes** - control whether to import images or store remote URLs
+- **Timeouts and retries** - robust against network hiccups
+- **Framework-agnostic** - works in Node, serverless, or custom cron jobs
+- **Field protection** - only updates `arena*` fields; respects `lockAll` and `lockImage` flags
+
+---
 
 ## Installation
-
-Install from npm:
 
 ```bash
 npm install arena-sanity-core
 ```
 
+### Peer dependencies
+
+- `@sanity/client` (required) - install with `npm install @sanity/client`
+- `are.na` (optional) - only needed if using `createArenaClient` helper
+
+---
+
 ## Usage
 
-1. Create clients
+### 1. Create clients
 
 ```js
 import {
@@ -40,12 +47,13 @@ const sanity = createSanityClient({
   token: process.env.SANITY_API_TOKEN,
 });
 
+// Requires `are.na` package: npm install are.na
 const arena = createArenaClient({
   accessToken: process.env.ARENA_ACCESS_TOKEN,
 });
 ```
 
-2. Run a sync
+### 2. Run a sync
 
 ```js
 const result = await syncArenaChannels({
@@ -53,7 +61,7 @@ const result = await syncArenaChannels({
   sanity,
   options: {
     channels: ["my-channel-slug", "another-channel"],
-    imageUpload: "auto", // "auto" | "on" | "off"
+    imageUpload: "auto",
     timeBudgetMs: 250_000,
     onLog: (e) => console.log(e),
   },
@@ -62,7 +70,7 @@ const result = await syncArenaChannels({
 console.log(result);
 ```
 
-Example result (shape):
+### Example result
 
 ```json
 {
@@ -76,29 +84,33 @@ Example result (shape):
 }
 ```
 
+---
+
 ## Options
 
-|            Option | Default  | Description                                                                               |
-| ----------------: | :------- | :---------------------------------------------------------------------------------------- |
-|          channels | required | Array of Are.na channel slugs to sync.                                                    |
-|           perPage | 100      | Page size for Are.na API calls.                                                           |
-|    arenaTimeoutMs | 15000    | Timeout per Are.na API request (ms).                                                      |
-|    imageTimeoutMs | 15000    | Timeout per image fetch (ms).                                                             |
-|   sanityTimeoutMs | 20000    | Timeout for Sanity queries (ms).                                                          |
-|           retries | 3        | Retry count for Are.na fetches.                                                           |
-|         backoffMs | 600      | Backoff multiplier between retries (ms).                                                  |
-|  logProgressEvery | 25       | Log heartbeat every N blocks.                                                             |
-|       heartbeatMs | 10000    | Channel heartbeat log interval (ms).                                                      |
-|       imageUpload | "auto"   | Image handling: "off" (never upload), "auto" (only if missing), "on" (always if changed). |
-|  imageConcurrency | 3        | Parallel image uploads.                                                                   |
-| normalizeChannels | true     | Normalize channel titles + \_keys.                                                        |
-|          driftFix | true     | Remove channel slugs from docs if a block disappears.                                     |
-|      timeBudgetMs | ∞        | Soft stop after N ms.                                                                     |
-|             onLog | noop     | Callback for structured logs.                                                             |
+| Option | Default | Description |
+| -----: | :------ | :---------- |
+| channels | required | Array of Are.na channel slugs to sync |
+| perPage | 100 | Page size for Are.na API calls |
+| arenaTimeoutMs | 15000 | Timeout per Are.na API request (ms) |
+| imageTimeoutMs | 15000 | Timeout per image fetch (ms) |
+| sanityTimeoutMs | 20000 | Timeout for Sanity queries (ms) |
+| retries | 3 | Retry count for Are.na fetches |
+| backoffMs | 600 | Backoff multiplier between retries (ms) |
+| logProgressEvery | 25 | Log heartbeat every N blocks |
+| heartbeatMs | 10000 | Channel heartbeat log interval (ms) |
+| imageUpload | "auto" | `"off"` (never), `"auto"` (if missing), `"on"` (always) |
+| imageConcurrency | 3 | Parallel image uploads |
+| normalizeChannels | true | Normalize channel titles and `_key` values |
+| driftFix | true | Remove channel refs if block disappears from Are.na |
+| timeBudgetMs | Infinity | Soft stop after N ms |
+| onLog | noop | Callback for structured logs |
 
-## Returned result
+---
 
-`syncArenaChannels()` resolves to a `SyncResult` object (TypeScript shape):
+## Return type
+
+`syncArenaChannels()` resolves to a `SyncResult`:
 
 ```ts
 interface SyncResult {
@@ -123,6 +135,8 @@ interface ChannelResult {
 }
 ```
 
+---
+
 ## Example: Cloudflare Worker
 
 ```js
@@ -140,26 +154,55 @@ export default {
       token: env.SANITY_API_TOKEN,
     });
 
-    const arena = createArenaClient({ accessToken: env.ARENA_ACCESS_TOKEN });
+    const arena = createArenaClient({
+      accessToken: env.ARENA_ACCESS_TOKEN,
+    });
 
     ctx.waitUntil(
       syncArenaChannels({
         arena,
         sanity,
         options: { channels: env.ARENA_CHANNELS.split(",") },
-      }),
+      })
     );
   },
 };
 ```
 
-## Limits & notes
+---
 
-- Are.na API rate limits: ~60 requests/minute. Retries and backoff are built in.
-- Images: Uploading into Sanity consumes storage/bandwidth — disable with `imageUpload: "off"` if needed.
-- Field protection: Only updates `arena*` fields and `channels`. Respects `lockAll` and `lockImage` if present.
+## Custom Arena client
 
-## Related
+If you prefer not to use `createArenaClient`, implement the `ArenaClient` interface:
 
-- `arena-sanity-adapter-nuxt` — drop-in Nuxt 3 API route.
-- `sanity-plugin-arena-sync` — Studio dashboard plugin for config and manual sync trigger.
+```ts
+interface ArenaClient {
+  getChannelPage(
+    slug: string,
+    params: { page: number; per: number }
+  ): Promise<{ contents: any[]; total_pages?: number; title?: string }>;
+
+  getChannelInfo?(slug: string): Promise<{ title?: string }>;
+}
+```
+
+---
+
+## Limits and notes
+
+- **Are.na API rate limits**: ~60 requests/minute. Retries and backoff are built in.
+- **Images**: Uploading to Sanity consumes storage. Use `imageUpload: "off"` to disable.
+- **Field protection**: Only updates `arena*` fields and `channels`. Respects `lockAll` and `lockImage`.
+
+---
+
+## Related packages
+
+- [arena-sanity-adapter-nuxt](../adapter-nuxt) - Nuxt 3 API route
+- [sanity-plugin-arena-sync](../sanity-plugin-arena-sync) - Studio dashboard plugin
+
+---
+
+## License
+
+MIT - Bartek Pierscinski

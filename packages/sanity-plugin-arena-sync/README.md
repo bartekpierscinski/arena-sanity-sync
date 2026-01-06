@@ -1,148 +1,127 @@
-> This is a **Sanity Studio v3** plugin.
-
-## Usage
-
 # sanity-plugin-arena-sync
 
-> Sanity Studio v3 plugin — Are.na sync dashboard
+Sanity Studio v3 plugin for the Are.na sync dashboard.
 
-Adds an Are.na Sync dashboard to your Studio:
+---
 
-- Shows which Are.na channels are being synced.
-- Displays last sync status and time.
-- Lets editors trigger a manual sync (the plugin calls your backend endpoint).
-- Auto-refreshes when configuration changes.
+## Features
 
-This plugin is part of an ecosystem of packages for syncing Are.na content to Sanity. For more information and documentation, please visit the main repository:
+- Shows configured Are.na channel slugs
+- Displays last sync status and timestamp
+- Manual sync trigger button (calls your backend endpoint)
+- Auto-refreshes when configuration changes
 
-[https://github.com/bartekpierscinski/arena-sanity-sync](https://github.com/bartekpierscinski/arena-sanity-sync)
+This plugin is part of the [arena-sanity-sync](https://github.com/bartekpierscinski/arena-sanity-sync) ecosystem.
 
 ---
 
 ## Installation
 
-Install the plugin in your Studio project:
-
 ```bash
 npm install sanity-plugin-arena-sync
 ```
 
-Then add it to your `sanity.config.ts` (or `.js`):
+Add it to your `sanity.config.ts`:
 
 ```ts
-import {defineConfig} from 'sanity'
-import {arenaSyncPlugin} from 'sanity-plugin-arena-sync'
+import { defineConfig } from "sanity";
+import { arenaSyncPlugin } from "sanity-plugin-arena-sync";
 
 export default defineConfig({
   // ...
   plugins: [arenaSyncPlugin()],
-})
+});
 ```
 
 ---
 
-## Setting up the sync endpoint
+## Configuration
 
-The plugin does not perform the sync itself. Instead it POSTs to an HTTP endpoint you host (Nuxt/Next/Node/Serverless). That endpoint should call `arena-sanity-core` (for example `syncArenaChannels`) to run the sync.
+The plugin does not perform syncs directly. It POSTs to an HTTP endpoint you host (Nuxt, Next.js, Cloudflare Worker, etc.) that runs [arena-sanity-core](../core).
 
-Guidance:
+### Option 1: Configuration document (recommended)
 
-- Example: a Nuxt `POST /api/sync` endpoint that calls `syncArenaChannels`.
-- Protect the endpoint with a secret (e.g. `Authorization: Bearer <SYNC_CRON_SECRET>`).
-- Ensure the endpoint is reachable from your Studio (configure CORS if needed).
+Create a document with ID `arenaSyncConfig` containing:
 
-You can configure the endpoint in two ways (priority: config document → env var):
+- `channelSlugs` - array of Are.na channel slugs to sync
+- `syncEndpoint` - URL to POST to when triggering sync
 
-1. Add a configuration document in Sanity with the ID `arenaSyncConfig` (preferred).
-2. Or set the `SANITY_STUDIO_SYNC_ENDPOINT` environment variable in your Studio host.
-
----
-
-## Configuration document
-
-The plugin looks for a document with ID `arenaSyncConfig`. That document can contain channel slugs, the optional `syncEndpoint`, and stores the last sync status.
-
-A ready-to-use schema for this config document is available at the following link:
+A ready-to-use schema is available at:
 
 ```
 schemas/arena/arenaSyncConfig.js
 ```
 
-[View arenaSyncConfig.js](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaSyncConfig.js)
-
-Copy the file `arenaSyncConfig.js` into your Studio's `schemas/` folder, then import it into your schema registry.
-
-How to import it (example):
+Copy it to your Studio's `schemas/` folder and import it:
 
 ```js
-import arenaSyncConfig from '../schemas/arena/arenaSyncConfig'
+import arenaSyncConfig from "./arena/arenaSyncConfig";
 
-export const schemaTypes = [
-  // ...other schemas
-  arenaSyncConfig,
-]
+export const schemaTypes = [arenaSyncConfig];
 ```
 
-Note: the example schemas in `schemas/arena/` show the `arena*` fields the sync engine uses. The sync only updates fields prefixed with `arena*` and respects `lockAll` / `lockImage` flags when present.
+### Option 2: Environment variable
 
----
-
-## Environment variables (Studio)
-
-If you prefer not to use the config document for the endpoint, set this env var in your Studio environment:
+Set in your Studio environment:
 
 ```bash
 SANITY_STUDIO_SYNC_ENDPOINT=https://your-app.xyz/api/sync
 ```
 
-The plugin will POST to this URL when an editor clicks **Trigger Full Sync Now** in the dashboard.
+The plugin will POST to this URL when an editor clicks "Trigger Full Sync Now".
 
 ---
 
-## Quick test (cURL)
+## Sync endpoint requirements
 
-Use this to test your sync endpoint before wiring it into the plugin:
+Your endpoint should:
+
+1. Accept POST requests
+2. Call `syncArenaChannels()` from `arena-sanity-core`
+3. Return a JSON response with `success: boolean`
+4. Optionally check authorization (e.g., `Authorization: Bearer <secret>`)
+
+Example implementation: see [arena-sanity-adapter-nuxt](../adapter-nuxt).
+
+---
+
+## Testing the endpoint
 
 ```bash
 curl -X POST "$SANITY_STUDIO_SYNC_ENDPOINT" \
-	-H "Authorization: Bearer $SYNC_CRON_SECRET" \
-	-H "Content-Type: application/json" \
-	-d '{"test":true}'
+  -H "Authorization: Bearer $SYNC_CRON_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"test": true}'
 ```
 
-The plugin expects a `200`/`2xx` response for success — adapt your endpoint to return an informative JSON body.
+---
+
+## Development
+
+This plugin uses [@sanity/plugin-kit](https://github.com/sanity-io/plugin-kit).
+
+```bash
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Lint
+npm run lint
+```
+
+See [Testing a plugin in Sanity Studio](https://github.com/sanity-io/plugin-kit#testing-a-plugin-in-sanity-studio) for local development instructions.
 
 ---
 
-## Develop & test
+## Related packages
 
-This plugin uses `@sanity/plugin-kit` with default build & watch scripts. To develop locally with hot-reload, follow the Sanity docs on testing plugins in Studio (run your Studio in dev mode and include the plugin source).
-
-See Sanity's official documentation: "Testing a plugin in Sanity Studio" for step-by-step instructions.
+- [arena-sanity-core](../core) - sync engine
+- [arena-sanity-adapter-nuxt](../adapter-nuxt) - Nuxt 3 API route
 
 ---
 
 ## License
 
-MIT © Bartek Pierściński
-
-
-## License
-
-[MIT](LICENSE) © Bartek Pierściński
-
-
-## Develop & test
-
-This plugin uses [@sanity/plugin-kit](https://github.com/sanity-io/plugin-kit)
-with default configuration for build & watch scripts.
-
-See [Testing a plugin in Sanity Studio](https://github.com/sanity-io/plugin-kit#testing-a-plugin-in-sanity-studio)
-on how to run this plugin with hotreload in the studio.
-
-### Release new version
-
-Run ["CI & Release" workflow](TODO/actions/workflows/main.yml).
-Make sure to select the main branch and check "Release new version".
-
-Semantic release will only release on configured branches, so it is safe to run release on any branch.
+MIT - Bartek Pierscinski
