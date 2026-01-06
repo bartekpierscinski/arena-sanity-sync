@@ -32,8 +32,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Build core
+        run: pnpm -C packages/core build
+
+      - name: Build sanity plugin
+        run: pnpm -C packages/sanity-plugin-arena-sync build
 
       - name: Test
         run: pnpm -C packages/core test
