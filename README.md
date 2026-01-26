@@ -112,6 +112,52 @@ curl -X POST "https://your-app.com/api/sync" \
 
 ---
 
+## CLI Usage
+
+You can also run syncs directly from the command line using `npx`:
+
+```bash
+npx arena-sanity-core --channels my-channel
+```
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-c, --channels <slugs>` | Comma-separated channel slugs (required) |
+| `-i, --image-upload <mode>` | Image upload mode: `off`, `auto`, `on` (default: `auto`) |
+| `-d, --dry-run` | Print what would happen without making changes |
+| `-v, --verbose` | Show detailed progress logs |
+| `-h, --help` | Show help message |
+| `--version` | Show version |
+
+### Examples
+
+```bash
+# Sync a single channel
+npx arena-sanity-core --channels my-channel
+
+# Sync multiple channels without uploading images
+npx arena-sanity-core -c channel-1,channel-2 -i off
+
+# Verbose output to see detailed progress
+npx arena-sanity-core -c my-channel -v
+
+# Dry run to preview what would be synced
+npx arena-sanity-core -c my-channel --dry-run
+```
+
+### Required Environment Variables
+
+```
+ARENA_ACCESS_TOKEN    # Are.na API access token
+SANITY_PROJECT_ID     # Sanity project ID
+SANITY_DATASET        # Sanity dataset name
+SANITY_TOKEN          # Sanity API token with write access
+```
+
+---
+
 ## Sanity schemas
 
 Example schemas are provided in `schemas/arena/`:
