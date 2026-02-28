@@ -1,0 +1,23 @@
+{
+  "name": "arena-sync-studio",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "@sanity/color-input": "^4.0.7",
+    "@sanity/vision": "^3.88.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sanity": "^3.88.3",
+    "sanity-plugin-arena-sync": "workspace:*",
+    "styled-components": "^6.1.18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.4",
+    "typescript": "^5.8.3"
+  }
+}
