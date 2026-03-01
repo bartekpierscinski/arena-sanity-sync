@@ -15,9 +15,13 @@ import {
   Checkbox,
   Avatar,
   Inline,
+  TabList,
+  Tab,
+  TabPanel,
 } from '@sanity/ui'
 import {useClient} from 'sanity'
 import {SearchIcon, SyncIcon, CheckmarkCircleIcon, CloseCircleIcon} from '@sanity/icons'
+import BlockBrowser from './components/BlockBrowser'
 
 const SANITY_API_VERSION = '2024-05-15'
 const CONFIG_DOC_ID = 'arenaSyncConfig'
@@ -136,6 +140,7 @@ const ArenaSyncTool = ({config: pluginConfig = {}}) => {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [isTriggeringSync, setIsTriggeringSync] = useState(false)
+  const [activeTab, setActiveTab] = useState('channels')
 
   /* ---- Load Are.na data ---- */
   const loadArena = useCallback(async () => {
@@ -393,65 +398,97 @@ const ArenaSyncTool = ({config: pluginConfig = {}}) => {
           </Flex>
         </Card>
 
-        {/* ---- Search + Filters ---- */}
-        <Flex gap={3} align="center" wrap="wrap">
-          <Box flex={1} style={{minWidth: 200}}>
-            <TextInput
-              icon={SearchIcon}
-              placeholder="Search channels..."
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-            />
-          </Box>
-          <Inline space={1}>
-            {FILTERS.map((f) => (
-              <Button
-                key={f.id}
-                text={f.label}
-                mode={filter === f.id ? 'default' : 'ghost'}
-                tone={filter === f.id ? 'primary' : 'default'}
-                fontSize={1}
-                padding={2}
-                onClick={() => setFilter(f.id)}
-              />
-            ))}
-          </Inline>
-        </Flex>
-
-        {/* ---- Toolbar ---- */}
-        <Flex gap={2} align="center">
-          <Button text="Select All" mode="ghost" fontSize={1} padding={2} onClick={selectAllVisible} />
-          <Button
-            text="Deselect All"
-            mode="ghost"
-            fontSize={1}
-            padding={2}
-            onClick={deselectAllVisible}
+        {/* ---- Tabs ---- */}
+        <TabList space={2}>
+          <Tab
+            aria-controls="channels-panel"
+            id="channels-tab"
+            label="Channels"
+            onClick={() => setActiveTab('channels')}
+            selected={activeTab === 'channels'}
           />
-          <Box flex={1} />
-          <Badge tone="default">
-            {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''}
-          </Badge>
-        </Flex>
+          <Tab
+            aria-controls="browse-panel"
+            id="browse-tab"
+            label="Browse Blocks"
+            onClick={() => setActiveTab('browse')}
+            selected={activeTab === 'browse'}
+          />
+        </TabList>
 
-        {/* ---- Channel Grid ---- */}
-        {filteredChannels.length === 0 ? (
-          <Card padding={5} tone="transparent" radius={2}>
-            <Flex align="center" justify="center">
-              <Text muted>No channels match your search.</Text>
-            </Flex>
-          </Card>
-        ) : (
-          <Grid columns={[1, 1, 2, 3]} gap={3}>
-            {filteredChannels.map((ch) => (
-              <ChannelCard
-                key={ch.slug}
-                channel={ch}
-                selected={selectedSlugs.includes(ch.slug)}
-                onToggle={toggleChannel}
-              />
-            ))}
-          </Grid>
+        {/* ---- Channels Tab ---- */}
+        {activeTab === 'channels' && (
+          <TabPanel aria-labelledby="channels-tab" id="channels-panel">
+            <Stack space={4}>
+              {/* ---- Search + Filters ---- */}
+              <Flex gap={3} align="center" wrap="wrap">
+                <Box flex={1} style={{minWidth: 200}}>
+                  <TextInput
+                    icon={SearchIcon}
+                    placeholder="Search channels..."
+                    value={search}
+                    onChange={(e) => setSearch(e.currentTarget.value)}
+                  />
+                </Box>
+                <Inline space={1}>
+                  {FILTERS.map((f) => (
+                    <Button
+                      key={f.id}
+                      text={f.label}
+                      mode={filter === f.id ? 'default' : 'ghost'}
+                      tone={filter === f.id ? 'primary' : 'default'}
+                      fontSize={1}
+                      padding={2}
+                      onClick={() => setFilter(f.id)}
+                    />
+                  ))}
+                </Inline>
+              </Flex>
+
+              {/* ---- Toolbar ---- */}
+              <Flex gap={2} align="center">
+                <Button text="Select All" mode="ghost" fontSize={1} padding={2} onClick={selectAllVisible} />
+                <Button
+                  text="Deselect All"
+                  mode="ghost"
+                  fontSize={1}
+                  padding={2}
+                  onClick={deselectAllVisible}
+                />
+                <Box flex={1} />
+                <Badge tone="default">
+                  {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''}
+                </Badge>
+              </Flex>
+
+              {/* ---- Channel Grid ---- */}
+              {filteredChannels.length === 0 ? (
+                <Card padding={5} tone="transparent" radius={2}>
+                  <Flex align="center" justify="center">
+                    <Text muted>No channels match your search.</Text>
+                  </Flex>
+                </Card>
+              ) : (
+                <Grid columns={[1, 1, 2, 3]} gap={3}>
+                  {filteredChannels.map((ch) => (
+                    <ChannelCard
+                      key={ch.slug}
+                      channel={ch}
+                      selected={selectedSlugs.includes(ch.slug)}
+                      onToggle={toggleChannel}
+                    />
+                  ))}
+                </Grid>
+              )}
+            </Stack>
+          </TabPanel>
+        )}
+
+        {/* ---- Browse Blocks Tab ---- */}
+        {activeTab === 'browse' && (
+          <TabPanel aria-labelledby="browse-tab" id="browse-panel">
+            <BlockBrowser />
+          </TabPanel>
         )}
 
       </Stack>

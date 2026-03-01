@@ -40,9 +40,11 @@ Nuxt 3 adapter.
 
 Sanity Studio plugin.
 
-- Adds an "Are.na Sync" dashboard tool
-- Displays configured channel slugs, last sync status, and logs
-- Allows manual sync trigger from Studio
+- Adds an "Are.na Sync" tool with channel picker and block browser
+- Bundles and auto-registers all schemas (`areNaBlock`, `arenaSyncConfig`, `arenaChannelSettings`)
+- Structure builder for organized desk hierarchy (by type, by channel, orphans)
+- Schemas are extensible — add your own custom fields
+- Real-time config updates, manual sync trigger
 
 [Read docs](./packages/sanity-plugin-arena-sync/README.md)
 
@@ -160,19 +162,20 @@ SANITY_TOKEN          # Sanity API token with write access
 
 ## Sanity schemas
 
-Example schemas are provided in `schemas/arena/`:
+**If you use the Studio plugin** (recommended), schemas are bundled and auto-registered:
 
-- `arenaBlock.jsx` - document schema for Are.na blocks
-- `arenaChannelSettings.js` - channel settings schema
-- `arenaSyncConfig.js` - sync configuration
-
-Copy these into your Studio's `schemas/` folder and import them:
-
-```js
-import areNaBlock from "./arena/arenaBlock";
-
-export const schemaTypes = [areNaBlock];
+```ts
+import { arenaSyncPlugin } from "sanity-plugin-arena-sync";
+plugins: [arenaSyncPlugin()]; // registers all three schemas
 ```
+
+To extend schemas with custom fields, set `schemas: false` and spread the exports. See the [plugin README](./packages/sanity-plugin-arena-sync/README.md#extending-schemas-with-custom-fields).
+
+**Standalone schemas** are also available in `schemas/arena/` for projects not using the plugin:
+
+- `arenaBlock.jsx` — document schema for Are.na blocks
+- `arenaChannelSettings.js` — per-channel settings (visibility)
+- `arenaSyncConfig.js` — sync configuration singleton
 
 The sync engine only updates fields prefixed with `arena*` and respects `lockAll`/`lockImage` flags.
 

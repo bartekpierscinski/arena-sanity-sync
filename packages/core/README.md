@@ -14,22 +14,22 @@ npm install arena-sanity-core @sanity/client are.na
 
 ### 2. Add the schema to your Sanity project
 
-Copy the schema file from this repository into your Sanity project:
+**Recommended:** install the Studio plugin which bundles and auto-registers all schemas:
 
 ```bash
-# From the arena-sanity-sync repo
-cp schemas/arena/arenaBlock.jsx your-sanity-project/schemas/
+npm install sanity-plugin-arena-sync
 ```
 
-Or download directly:
-- [`arenaBlock.jsx`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaBlock.jsx)
+```ts
+import { arenaSyncPlugin } from "sanity-plugin-arena-sync";
+plugins: [arenaSyncPlugin()]; // registers areNaBlock + arenaSyncConfig + arenaChannelSettings
+```
 
-Then import it in your `schemas/index.js`:
+**Or manually:** copy [`schemas/arena/arenaBlock.jsx`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaBlock.jsx) into your project and register it:
 
 ```js
-import areNaBlock from './arenaBlock'
-
-export const schemaTypes = [areNaBlock]
+import areNaBlock from "./arenaBlock";
+export const schemaTypes = [areNaBlock];
 ```
 
 ### 3. Set environment variables
@@ -188,9 +188,23 @@ The sync creates documents of type `areNaBlock`. The full schema includes:
 - Field locking (`lockAll`, `lockImage`)
 - Raw Are.na data preservation
 
-Schema files:
-- [`schemas/arena/arenaBlock.jsx`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaBlock.jsx) - main block schema
-- [`schemas/arena/arenaSyncConfig.js`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaSyncConfig.js) - optional config document for Studio plugin
+**If you use the Studio plugin**, schemas are bundled and auto-registered — no manual setup needed:
+
+```bash
+npm install sanity-plugin-arena-sync
+```
+
+```ts
+import { arenaSyncPlugin } from "sanity-plugin-arena-sync";
+// Registers areNaBlock, arenaSyncConfig, arenaChannelSettings automatically
+plugins: [arenaSyncPlugin()];
+```
+
+See the [plugin README](https://www.npmjs.com/package/sanity-plugin-arena-sync) for extending schemas with custom fields.
+
+**Standalone (without the plugin)** — copy from `schemas/arena/` in the repo:
+- [`arenaBlock.jsx`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaBlock.jsx)
+- [`arenaSyncConfig.js`](https://github.com/bartekpierscinski/arena-sanity-sync/blob/main/schemas/arena/arenaSyncConfig.js)
 
 ---
 
