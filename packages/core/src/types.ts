@@ -11,8 +11,6 @@ export interface SyncOptions {
   logProgressEvery?: number;
   heartbeatMs?: number;
   imageUpload?: ImageUploadMode;
-  imageConcurrency?: number;
-  normalizeChannels?: boolean;
   driftFix?: boolean;
   timeBudgetMs?: number;
   onLog?: (e: Record<string, unknown>) => void;

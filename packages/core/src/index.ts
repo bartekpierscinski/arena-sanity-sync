@@ -69,8 +69,6 @@ export async function syncArenaChannels(input: {
     logProgressEvery: 25,
     heartbeatMs: 10000,
     imageUpload: "auto",
-    imageConcurrency: 3,
-    normalizeChannels: true,
     driftFix: true,
     timeBudgetMs: Number.MAX_SAFE_INTEGER,
     onLog: () => {},
@@ -551,4 +549,5 @@ function safeHost(url: string) {
 export * from "./types.js";
 export * from "./utils.js";
 export { createSanityClient } from "./sanity.js";
-export { createArenaClient } from "./arena.js";
+export { createArenaClient, ArenaApiError } from "./arena.js";
+export type { ArenaClientOptions, RateLimitState } from "./arena-types.js";
