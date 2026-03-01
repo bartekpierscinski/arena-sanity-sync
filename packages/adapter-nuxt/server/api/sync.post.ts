@@ -1,7 +1,6 @@
 // server/api/sync.post.ts
-import { syncArenaChannels } from "arena-sanity-core";
+import { syncArenaChannels, createArenaClient } from "arena-sanity-core";
 import { createClient } from "@sanity/client";
-import { createArenaClient } from "../utils/arenaClient";
 
 export default defineEventHandler(async (event) => {
   const cfg = useRuntimeConfig();
@@ -51,7 +50,6 @@ export default defineEventHandler(async (event) => {
     options: {
       channels,
       imageUpload: "auto",
-      imageConcurrency: 3,
       timeBudgetMs: 260_000,
       onLog: (e) => console.log(JSON.stringify(e)),
     },

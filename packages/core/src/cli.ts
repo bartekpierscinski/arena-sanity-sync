@@ -6,7 +6,7 @@ import { createSanityClient } from "./sanity.js";
 import { createArenaClient } from "./arena.js";
 import type { ImageUploadMode } from "./types.js";
 
-const VERSION = "0.3.1";
+const VERSION = "0.4.0";
 
 const HELP = `
 arena-sanity-core - Sync Are.na channels to Sanity
@@ -176,6 +176,28 @@ async function main() {
     });
 
     const duration = Date.now() - startTime;
+    const statusSummary = result.channels
+      ? result.channels
+          .map(
+            (ch) =>
+              `${ch.success ? "✓" : "✗"} ${ch.channel}: ${ch.created} created, ${ch.updated} updated, ${ch.skippedUnchanged} unchanged`
+          )
+          .join("; ")
+      : `${result.updatedOrCreated} updated`;
+
+    // Update arenaSyncConfig with last sync info
+    try {
+      await sanity
+        .patch("arenaSyncConfig")
+        .set({
+          lastSyncDate: new Date().toISOString(),
+          lastSyncStatus: `${result.success ? "SUCCESS" : "FAILED"} in ${formatDuration(duration)} — ${statusSummary}`,
+        })
+        .commit();
+    } catch (patchErr: any) {
+      console.warn(`Warning: could not update arenaSyncConfig: ${patchErr.message}`);
+    }
+
     console.log("");
     console.log("─".repeat(40));
     console.log(`Status:   ${result.success ? "SUCCESS" : "FAILED"}`);
@@ -199,6 +221,20 @@ async function main() {
     process.exit(result.success ? 0 : 1);
   } catch (err: any) {
     const duration = Date.now() - startTime;
+
+    // Update arenaSyncConfig with failure info
+    try {
+      await sanity
+        .patch("arenaSyncConfig")
+        .set({
+          lastSyncDate: new Date().toISOString(),
+          lastSyncStatus: `FAILED in ${formatDuration(duration)} — ${err.message}`,
+        })
+        .commit();
+    } catch {
+      // ignore patch errors on failure path
+    }
+
     console.error("");
     console.error("─".repeat(40));
     console.error(`Status:   FAILED`);

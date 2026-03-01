@@ -1,15 +1,18 @@
 # sanity-plugin-arena-sync
 
-Sanity Studio v3 plugin for the Are.na sync dashboard.
+Sanity Studio v3 plugin for managing Are.na channel sync — browse, search, and toggle channels directly from Studio.
 
 ---
 
 ## Features
 
-- Shows configured Are.na channel slugs
-- Displays last sync status and timestamp
-- Manual sync trigger button (calls your backend endpoint)
-- Auto-refreshes when configuration changes
+- **Interactive channel picker** — browse all your Are.na channels in a searchable, filterable grid
+- **Toggle sync per channel** — click a card to add/remove it from `arenaSyncConfig.channelSlugs` (auto-saves)
+- **Search & filter** — client-side search by title/slug, filter tabs (All / Selected / Public / Private)
+- **Bulk actions** — Select All / Deselect All within the current filter
+- **Last sync status** — shows timestamp and result summary at the top
+- **Manual sync trigger** — POST to your backend endpoint from the UI
+- **Real-time updates** — listens for `arenaSyncConfig` changes via Sanity listener
 
 This plugin is part of the [arena-sanity-sync](https://github.com/bartekpierscinski/arena-sanity-sync) ecosystem.
 
@@ -37,38 +40,74 @@ export default defineConfig({
 
 ## Configuration
 
-The plugin does not perform syncs directly. It POSTs to an HTTP endpoint you host (Nuxt, Next.js, Cloudflare Worker, etc.) that runs [arena-sanity-core](../core).
+### Are.na access token (required)
 
-### Option 1: Configuration document (recommended)
+The plugin needs your Are.na API token to fetch your channels. Provide it in one of two ways:
 
-Create a document with ID `arenaSyncConfig` containing:
+**Option A: Environment variable (recommended)**
 
-- `channelSlugs` - array of Are.na channel slugs to sync
-- `syncEndpoint` - URL to POST to when triggering sync
+Add to your Studio `.env`:
 
-A ready-to-use schema is available at:
-
-```
-schemas/arena/arenaSyncConfig.js
+```bash
+SANITY_STUDIO_ARENA_ACCESS_TOKEN=your_arena_token
 ```
 
-Copy it to your Studio's `schemas/` folder and import it:
+Vite auto-exposes `SANITY_STUDIO_*` vars via `import.meta.env`.
 
-```js
-import arenaSyncConfig from "./arena/arenaSyncConfig";
+**Option B: Plugin config**
 
-export const schemaTypes = [arenaSyncConfig];
+```ts
+plugins: [
+  arenaSyncPlugin({ arenaAccessToken: "your_arena_token" }),
+],
 ```
 
-### Option 2: Environment variable
+### Sync endpoint (optional)
 
-Set in your Studio environment:
+To enable the "Trigger Sync" button, configure the URL the plugin will POST to.
+
+**Via Sanity document:** set the `syncEndpoint` field on the `arenaSyncConfig` document.
+
+**Via environment variable:**
 
 ```bash
 SANITY_STUDIO_SYNC_ENDPOINT=https://your-app.xyz/api/sync
 ```
 
-The plugin will POST to this URL when an editor clicks "Trigger Full Sync Now".
+### Sanity schema
+
+The plugin reads/writes the `arenaSyncConfig` singleton document (ID: `arenaSyncConfig`). A ready-to-use schema is available at:
+
+```
+schemas/arena/arenaSyncConfig.js
+```
+
+Copy it to your Studio's schemas folder and register it:
+
+```js
+import arenaSyncConfig from "./arenaSyncConfig";
+
+export const schemaTypes = [arenaSyncConfig /* , ...other types */];
+```
+
+The document stores:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `channelSlugs` | `string[]` | Channel slugs selected for sync (managed by the plugin) |
+| `syncEndpoint` | `url` | POST target for "Trigger Sync" button |
+| `lastSyncDate` | `datetime` | Set by CLI/adapter after sync completes |
+| `lastSyncStatus` | `text` | Summary of last sync result |
+
+---
+
+## How it works
+
+1. On mount, the plugin calls `GET /v3/me` with your token to resolve your Are.na user
+2. Paginates `GET /v3/users/{slug}/contents?type=Channel` to load all channels
+3. Fetches `arenaSyncConfig` from Sanity to determine which channels are selected
+4. Toggling a channel card immediately patches `channelSlugs` in the config doc (optimistic UI)
+5. If the config doc doesn't exist yet, it's created on first toggle
 
 ---
 
@@ -78,21 +117,9 @@ Your endpoint should:
 
 1. Accept POST requests
 2. Call `syncArenaChannels()` from `arena-sanity-core`
-3. Return a JSON response with `success: boolean`
-4. Optionally check authorization (e.g., `Authorization: Bearer <secret>`)
+3. Return JSON with `success: boolean` (or `overallSuccess: boolean`)
 
 Example implementation: see [arena-sanity-adapter-nuxt](../adapter-nuxt).
-
----
-
-## Testing the endpoint
-
-```bash
-curl -X POST "$SANITY_STUDIO_SYNC_ENDPOINT" \
-  -H "Authorization: Bearer $SYNC_CRON_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{"test": true}'
-```
 
 ---
 
@@ -101,23 +128,27 @@ curl -X POST "$SANITY_STUDIO_SYNC_ENDPOINT" \
 This plugin uses [@sanity/plugin-kit](https://github.com/sanity-io/plugin-kit).
 
 ```bash
-# Install dependencies
-npm install
-
 # Build
-npm run build
+pnpm build
 
 # Lint
-npm run lint
+pnpm lint
+
+# Watch mode
+pnpm watch
 ```
 
-See [Testing a plugin in Sanity Studio](https://github.com/sanity-io/plugin-kit#testing-a-plugin-in-sanity-studio) for local development instructions.
+A test studio is available at `studio/` in the monorepo root:
+
+```bash
+pnpm -C studio dev
+```
 
 ---
 
 ## Related packages
 
-- [arena-sanity-core](../core) - sync engine
+- [arena-sanity-core](../core) - sync engine & CLI
 - [arena-sanity-adapter-nuxt](../adapter-nuxt) - Nuxt 3 API route
 
 ---

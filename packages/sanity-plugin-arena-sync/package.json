@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-arena-sync",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "description": "Sanity Studio v3 plugin for Are.na sync dashboard",
   "keywords": [
     "sanity",
@@ -38,8 +38,7 @@
     "@sanity/client": "^7.2.1",
     "@sanity/icons": "^3.5.0",
     "@sanity/incompatible-plugin": "^1.0.5",
-    "@sanity/ui": "^2.15.17",
-    "are.na": "^0.1.5"
+    "@sanity/ui": "^2.15.17"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
