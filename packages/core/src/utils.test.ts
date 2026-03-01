@@ -67,7 +67,15 @@ describe("pruneArenaRaw", () => {
 });
 
 describe("buildImageSignature", () => {
-  it("should build signature from original image url and size", () => {
+  it("should build signature from v3 image src and file_size", () => {
+    const block = {
+      image: { src: "https://cdn.are.na/img.jpg", file_size: 12345 },
+    };
+    const result = buildImageSignature(block);
+    expect(result).toBe("https://cdn.are.na/img.jpg|12345");
+  });
+
+  it("should fall back to v2 image.original fields", () => {
     const block = {
       image: { original: { url: "https://example.com/img.jpg", file_size: 12345 } },
     };
@@ -82,30 +90,30 @@ describe("buildImageSignature", () => {
   });
 
   it("should handle missing file_size", () => {
-    const block = { image: { original: { url: "https://example.com/img.jpg" } } };
+    const block = { image: { src: "https://cdn.are.na/img.jpg" } };
     const result = buildImageSignature(block);
-    expect(result).toBe("https://example.com/img.jpg|");
+    expect(result).toBe("https://cdn.are.na/img.jpg|");
   });
 });
 
 describe("computeFingerprint", () => {
   it("should return base64 encoded fingerprint", () => {
-    const block = { id: 1, title: "Test", class: "Text", updated_at: "2024-01-01" };
+    const block = { id: 1, title: "Test", type: "Text", updated_at: "2024-01-01" };
     const result = computeFingerprint(block);
     expect(result).toBeTruthy();
     expect(typeof result).toBe("string");
   });
 
   it("should produce consistent fingerprints for same input", () => {
-    const block = { id: 1, title: "Test", class: "Text", updated_at: "2024-01-01" };
+    const block = { id: 1, title: "Test", type: "Text", updated_at: "2024-01-01" };
     const result1 = computeFingerprint(block);
     const result2 = computeFingerprint(block);
     expect(result1).toBe(result2);
   });
 
   it("should produce different fingerprints for different input", () => {
-    const block1 = { id: 1, title: "Test", class: "Text", updated_at: "2024-01-01" };
-    const block2 = { id: 2, title: "Test", class: "Text", updated_at: "2024-01-01" };
+    const block1 = { id: 1, title: "Test", type: "Text", updated_at: "2024-01-01" };
+    const block2 = { id: 2, title: "Test", type: "Text", updated_at: "2024-01-01" };
     const result1 = computeFingerprint(block1);
     const result2 = computeFingerprint(block2);
     expect(result1).not.toBe(result2);

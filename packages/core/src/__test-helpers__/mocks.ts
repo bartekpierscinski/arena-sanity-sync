@@ -2,18 +2,17 @@ import type { ArenaClient, SanityClientLite, SanityPatchBuilder } from "../types
 
 // ─── Arena helpers ────────────────────────────────────────
 
-/** Create a minimal Are.na block for testing */
+/** Create a minimal Are.na v3 block for testing */
 export function makeBlock(overrides: Record<string, any> = {}) {
   const id = overrides.id ?? Math.floor(Math.random() * 100_000);
   return {
     id,
     title: `Block ${id}`,
-    class: "Text",
+    type: "Text",
     updated_at: "2025-01-01T00:00:00.000Z",
     created_at: "2025-01-01T00:00:00.000Z",
-    description_html: null,
-    content_html: `<p>Content of ${id}</p>`,
-    generated_title: null,
+    description: null,
+    content_html: null,
     source: null,
     image: null,
     ...overrides,

@@ -139,11 +139,14 @@ describe("syncArenaChannels", () => {
     const block = makeBlock({
       id: 50,
       updated_at: "2025-06-01T00:00:00.000Z",
-      class: "Image",
+      type: "Image",
       image: {
-        original: { url: "https://example.com/new.jpg", file_size: 999 },
-        display: { url: "https://example.com/display.jpg" },
-        thumb: { url: "https://example.com/thumb.jpg" },
+        src: "https://example.com/new.jpg",
+        file_size: 999,
+        content_type: "image/jpeg",
+        filename: "new.jpg",
+        medium: { src: "https://example.com/display.jpg" },
+        small: { src: "https://example.com/thumb.jpg" },
       },
     });
     const { arena, sanity } = setup({ ch: [[block]] });
@@ -175,11 +178,12 @@ describe("syncArenaChannels", () => {
   it("does not upload images when imageUpload is off", async () => {
     const block = makeBlock({
       id: 60,
-      class: "Image",
+      type: "Image",
       image: {
-        original: { url: "https://example.com/img.jpg", file_size: 100 },
-        display: { url: "https://example.com/d.jpg" },
-        thumb: { url: "https://example.com/t.jpg" },
+        src: "https://example.com/img.jpg",
+        file_size: 100,
+        medium: { src: "https://example.com/d.jpg" },
+        small: { src: "https://example.com/t.jpg" },
       },
     });
     const { arena, sanity } = setup({ ch: [[block]] });
@@ -198,13 +202,14 @@ describe("syncArenaChannels", () => {
     const imgUrl = "https://example.com/auto-new.jpg";
     const block = makeBlock({
       id: 70,
-      class: "Image",
+      type: "Image",
       image: {
-        original: { url: imgUrl, file_size: 200 },
-        display: { url: imgUrl },
-        thumb: { url: imgUrl },
+        src: imgUrl,
+        file_size: 200,
         filename: "test.jpg",
         content_type: "image/jpeg",
+        medium: { src: imgUrl },
+        small: { src: imgUrl },
       },
     });
     const { arena, sanity } = setup({ ch: [[block]] });
@@ -235,11 +240,12 @@ describe("syncArenaChannels", () => {
   it("does not upload when auto and mainImage already exists", async () => {
     const block = makeBlock({
       id: 80,
-      class: "Image",
+      type: "Image",
       image: {
-        original: { url: "https://example.com/existing.jpg", file_size: 100 },
-        display: { url: "https://example.com/d.jpg" },
-        thumb: { url: "https://example.com/t.jpg" },
+        src: "https://example.com/existing.jpg",
+        file_size: 100,
+        medium: { src: "https://example.com/d.jpg" },
+        small: { src: "https://example.com/t.jpg" },
       },
     });
     const { arena, sanity } = setup({ ch: [[block]] });
@@ -268,14 +274,15 @@ describe("syncArenaChannels", () => {
     const imgUrl = "https://example.com/on-new.jpg";
     const block = makeBlock({
       id: 90,
-      class: "Image",
+      type: "Image",
       updated_at: "2025-06-01T00:00:00.000Z",
       image: {
-        original: { url: imgUrl, file_size: 300 },
-        display: { url: imgUrl },
-        thumb: { url: imgUrl },
+        src: imgUrl,
+        file_size: 300,
         filename: "on.jpg",
         content_type: "image/jpeg",
+        medium: { src: imgUrl },
+        small: { src: imgUrl },
       },
     });
     const { arena, sanity } = setup({ ch: [[block]] });

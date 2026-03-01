@@ -74,27 +74,26 @@ export function pruneArenaRaw(block: any) {
 }
 
 export function buildImageSignature(block: any) {
-  const orig = block?.image?.original;
-  return orig?.url ? `${orig.url}|${orig.file_size || ""}` : null;
+  // v3: image.src + image.file_size; v2 fallback: image.original.url
+  const src = block?.image?.src ?? block?.image?.original?.url;
+  const size = block?.image?.file_size ?? block?.image?.original?.file_size;
+  return src ? `${src}|${size || ""}` : null;
 }
 
 export function computeFingerprint(block: any) {
   try {
+    const imgSrc = block.image?.src ?? block.image?.original?.url;
+    const imgSize = block.image?.file_size ?? block.image?.original?.file_size;
     const core = {
       id: block.id,
       title: block.title,
-      class: block.class,
+      type: block.type ?? block.class,
       updated_at: block.updated_at,
-      description_html: block.description_html,
+      description: block.description ?? block.description_html,
       source: block.source
         ? { url: block.source.url, title: block.source.title }
         : null,
-      image: block.image?.original
-        ? {
-            url: block.image.original.url,
-            size: block.image.original.file_size,
-          }
-        : null,
+      image: imgSrc ? { url: imgSrc, size: imgSize } : null,
     };
     return btoa(JSON.stringify(core));
   } catch {

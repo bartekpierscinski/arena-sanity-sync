@@ -41,6 +41,7 @@ const ARENA_OWNED = new Set([
   "isOrphan",
   "lastSyncedAt",
   "lastSyncedBy",
+  "mainImage",
 ]);
 
 function shouldUploadImage(
@@ -48,7 +49,7 @@ function shouldUploadImage(
   ctx: { existing: any; imageSignatureChanged: boolean },
 ) {
   if (mode === "off") return false;
-  if (mode === "on") return ctx.imageSignatureChanged;
+  if (mode === "on") return ctx.imageSignatureChanged || !ctx.existing?.mainImage;
   // 'auto'
   return !ctx.existing?.mainImage && ctx.imageSignatureChanged;
 }
@@ -222,14 +223,18 @@ async function syncSingleChannel(ctx: {
         const imageSignature = buildImageSignature(block);
         const fingerprint = computeFingerprint(block);
         const arenaUpdatedAt = block.updated_at;
-        const sourceTitle = block.title || block.generated_title || null;
+        const sourceTitle = block.title || null;
         const fallbackTitle = `Block ${block.id}`;
 
         // idempotent short-circuit
+        // Skip if block is unchanged, UNLESS image upload is "on" and mainImage is missing
+        const needsImageForce =
+          opts.imageUpload === "on" && !existing?.mainImage && imageSignature;
         if (
           existing &&
           existing.arenaUpdatedAt === arenaUpdatedAt &&
-          existing.arenaFingerprint === fingerprint
+          existing.arenaFingerprint === fingerprint &&
+          !needsImageForce
         ) {
           if (existing.lockAll) {
             stats.skippedUnchanged++;
@@ -279,10 +284,13 @@ async function syncSingleChannel(ctx: {
             existing,
             imageSignatureChanged,
           });
+        // v3 uses "type" (Image, Link, Attachment, etc.); v2 used "class"
+        const blockClass = block.type ?? block.class;
         const canUpload =
-          wantUpload && (block.class === "Image" || block.class === "Link");
+          wantUpload && (blockClass === "Image" || blockClass === "Link" || blockClass === "Attachment");
         if (canUpload) {
-          const url = block?.image?.original?.url;
+          // v3: image.src; v2 fallback: image.original.url
+          const url = block?.image?.src ?? block?.image?.original?.url;
           if (url) {
             try {
               log("log", "image_fetch_start", {
@@ -297,11 +305,13 @@ async function syncSingleChannel(ctx: {
                   statusText: resp.statusText,
                 });
               } else {
-                const buf = await resp.arrayBuffer();
+                const buf = Buffer.from(await resp.arrayBuffer());
+                const imgFilename = block.image?.filename || block.image?.original?.filename;
+                const imgContentType = block.image?.content_type || block.image?.original?.content_type;
                 const asset = await sanity.assets.upload("image", buf, {
                   filename:
-                    block.image.filename ||
-                    `arena-${block.id}-${Date.now()}.${block.image.content_type ? block.image.content_type.split("/")[1] : "jpg"}`,
+                    imgFilename ||
+                    `arena-${block.id}-${Date.now()}.${imgContentType ? imgContentType.split("/")[1] : "jpg"}`,
                 });
                 mainImagePatch.mainImage = {
                   _type: "image",
@@ -325,14 +335,15 @@ async function syncSingleChannel(ctx: {
           channels,
           arenaId: block.id,
           arenaBlockUrl: `https://www.are.na/block/${block.id}`,
-          blockType: block.class,
-          description: block.description_html || null,
+          blockType: block.type ?? block.class,
+          description: block.description ?? block.description_html ?? null,
           contentHtml: block.content_html || null,
           sourceUrl: block.source?.url || null,
           sourceTitle,
           sourceProviderName: block.source?.provider?.name || null,
-          externalImageUrl: block.image?.display?.url || null,
-          externalImageThumbUrl: block.image?.thumb?.url || null,
+          // v3: image.medium.src / image.small.src; v2: image.display.url / image.thumb.url
+          externalImageUrl: block.image?.medium?.src ?? block.image?.display?.url ?? block.image?.src ?? null,
+          externalImageThumbUrl: block.image?.small?.src ?? block.image?.thumb?.url ?? null,
           arenaCreatedAt: block.created_at,
           arenaUpdatedAt,
           rawArenaData: sanitizeObjectForSanity(pruneArenaRaw(block)),
